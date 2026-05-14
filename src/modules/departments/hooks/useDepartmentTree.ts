@@ -42,6 +42,7 @@ export const useDepartmentTree = () => {
     const loadRoots = useCallback(async () => {
         setLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 300));
             const res = await departmentApi.getRootsPaged(1, 100);
             setTreeData(res.data.items.map(mapNode));
         } catch {
@@ -106,8 +107,8 @@ export const useDepartmentTree = () => {
                 return nodes.filter(n => n.id !== id).map(n => {
                     if (n.children) {
                         const newChildren = removeFn(n.children);
-                        return { 
-                            ...n, 
+                        return {
+                            ...n,
                             children: newChildren.length ? newChildren : undefined,
                             isLeaf: newChildren.length === 0,
                             hasChildren: newChildren.length > 0
@@ -161,8 +162,8 @@ export const useDepartmentTree = () => {
             return nodes.filter(n => n.id !== id).map(n => {
                 if (n.children) {
                     const newChildren = removeFn(n.children);
-                    return { 
-                        ...n, 
+                    return {
+                        ...n,
                         children: newChildren.length ? newChildren : undefined,
                         isLeaf: newChildren.length === 0,
                         hasChildren: newChildren.length > 0

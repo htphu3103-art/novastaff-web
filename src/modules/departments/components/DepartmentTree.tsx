@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Tree, Input, Button, Typography, Space, Tooltip, Spin, Popconfirm, Tag } from "antd";
+import { Tree, Input, Button, Typography, Space, Tooltip, Spin, Popconfirm, Tag, Skeleton } from "antd";
 import { 
     PlusOutlined, 
     SearchOutlined, 
@@ -120,7 +120,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
 
             <div style={{ marginTop: 24, flex: 1, overflow: 'auto' }}>
                 {loading && treeData.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: 20 }}><Spin /></div>
+                    <Skeleton active paragraph={{ rows: 10 }} />
                 ) : (
                     <Tree
                         treeData={treeData}

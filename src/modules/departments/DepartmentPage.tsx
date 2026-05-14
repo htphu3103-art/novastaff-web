@@ -265,6 +265,7 @@ export default function DepartmentPage() {
     const loadEmployeesByDepartment = useCallback(async () => {
         setEmployeeLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 300));
             if (browser.currentNode.id == null) {
                 const res = await employeeApi.getPaged({}, 1, 50);
                 setEmployees(res.data.items);
@@ -526,7 +527,7 @@ export default function DepartmentPage() {
                     </Col>
                 </Row>
 
-                <DepartmentStats totalDepts={totalCount} totalMembers={employees.length} />
+                <DepartmentStats totalDepts={totalCount} totalMembers={employees.length} loading={loading || employeeLoading} />
 
                 <Card style={{ marginBottom: 16, borderRadius: 8 }}>
                     <Space wrap>
