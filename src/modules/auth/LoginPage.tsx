@@ -39,6 +39,7 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const onFinish = async (values: LoginRequest) => {
         setLoading(true);
@@ -51,12 +52,17 @@ const LoginPage: React.FC = () => {
             login(accessToken, userResponse.data);
 
             message.success('Welcome back to NovaStaff!');
-            navigate('/');
+            setIsSuccess(true);
+            sessionStorage.setItem('justLoggedIn', 'true');
+            setTimeout(() => {
+                document.body.style.backgroundColor = '#1e1b4b'; // Prevent flash
+                document.body.style.overflow = 'hidden'; // Prevent scrollbar shift
+                navigate('/');
+            }, 1200); // Allow animation to finish before navigating
         } catch (error: any) {
             console.error('Login error:', error);
             const errorMsg = error.response?.data?.message || 'Invalid username or password';
             message.error(errorMsg);
-        } finally {
             setLoading(false);
         }
     };
@@ -420,6 +426,55 @@ const LoginPage: React.FC = () => {
                     </motion.div>
                 </motion.div>
             </div>
+
+            {/* Success Overlay Transition (Senior Touch) */}
+            {isSuccess && (
+                <motion.div
+                    initial={{ top: '100%' }}
+                    animate={{ top: 0 }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                    style={{
+                        position: 'fixed',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: '100vh',
+                        background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden'
+                    }}
+                >
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
+                        style={{
+                            width: 80, height: 80,
+                            background: 'rgba(255,255,255,0.1)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            borderRadius: '20px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            marginBottom: 24,
+                            boxShadow: '0 0 40px rgba(99, 102, 241, 0.4)'
+                        }}
+                    >
+                        <Shield size={40} color="#fff" strokeWidth={1.5} />
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4, duration: 0.5 }}
+                    >
+                        <h3 style={{ color: '#fff', margin: 0, fontSize: 24, fontWeight: 600, letterSpacing: '-0.5px', fontFamily: "'Inter', sans-serif" }}>
+                            Welcome to NovaStaff
+                        </h3>
+                    </motion.div>
+                </motion.div>
+            )}
 
             {/* Responsive style for small screens */}
             <style>{`
