@@ -12,7 +12,8 @@ import {
     LogOut,
     ChevronLeft,
     Settings,
-    HelpCircle
+    HelpCircle,
+    Shield
 } from "lucide-react"
 import { useNavigate, useLocation, useOutlet } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
@@ -33,8 +34,8 @@ const CONTENT_DURATION = 200; // ms — page route transition
 const SIDEBAR_STYLES = `
     /* ── Base: all animated elements use GPU-friendly properties ─────────── */
     .nova-sidebar {
-        will-change: width;
-        transition: width ${SIDEBAR_DURATION}ms ${SPRING} !important;
+        will-change: width, min-width, max-width, flex;
+        transition: all ${SIDEBAR_DURATION}ms ${SPRING} !important;
     }
 
     /* ── Menu item base ──────────────────────────────────────────────────── */
@@ -162,9 +163,30 @@ export default function MainLayout() {
 
     const { user, isAuthenticated, logout } = useAuth();
 
+    // Smooth Intro Transition State
+    const [showIntro, setShowIntro] = useState(() => sessionStorage.getItem('justLoggedIn') === 'true');
+
     useEffect(() => {
         if (!isAuthenticated || !user) navigate('/login');
     }, [user, isAuthenticated, navigate]);
+
+    useEffect(() => {
+        if (showIntro) {
+            document.body.style.overflow = 'hidden'; // Lock scroll during intro
+            sessionStorage.removeItem('justLoggedIn');
+            const timer = setTimeout(() => {
+                setShowIntro(false);
+                setTimeout(() => {
+                    document.body.style.backgroundColor = '';
+                    document.body.style.overflow = ''; // Unlock scroll
+                }, 800); // Revert body styles after exit animation
+            }, 800); // Wait briefly before sliding away
+            return () => clearTimeout(timer);
+        } else {
+            document.body.style.backgroundColor = '';
+            document.body.style.overflow = '';
+        }
+    }, [showIntro]);
 
     if (!user) return null;
 
@@ -240,6 +262,54 @@ export default function MainLayout() {
         >
             {/* Inject animation styles once */}
             <style>{SIDEBAR_STYLES}</style>
+
+            <AnimatePresence>
+                {showIntro && (
+                    <motion.div
+                        initial={{ top: 0 }}
+                        exit={{ top: '-100%' }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '100vh',
+                            background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+                            zIndex: 99999, // Ensure it covers everything
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <motion.div
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.4 }}
+                            style={{
+                                width: 80, height: 80,
+                                background: 'rgba(255,255,255,0.1)',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                borderRadius: '20px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                marginBottom: 24,
+                                boxShadow: '0 0 40px rgba(99, 102, 241, 0.4)'
+                            }}
+                        >
+                            <Shield size={40} color="#fff" strokeWidth={1.5} />
+                        </motion.div>
+                        <motion.div
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            <h3 style={{ color: '#fff', margin: 0, fontSize: 24, fontWeight: 600, letterSpacing: '-0.5px', fontFamily: "'Inter', sans-serif" }}>
+                                Welcome to NovaStaff
+                            </h3>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <App>
                 <Layout style={{ minHeight: "100vh", background: "#f8fafc" }}>
@@ -469,19 +539,16 @@ export default function MainLayout() {
                         </Header>
 
                         {/* Page content */}
-                        <Content style={{ padding: '0px', background: '#f8fafc', minHeight: 'calc(100vh - 64px)', overflow: 'auto' }}>
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={location.pathname}
-                                    initial={{ opacity: 0, y: 8 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -8 }}
-                                    transition={{ duration: CONTENT_DURATION / 1000, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                    style={{ padding: '24px' }}
-                                >
-                                    {currentOutlet}
-                                </motion.div>
-                            </AnimatePresence>
+                        <Content style={{ padding: '0px', background: '#f8fafc', minHeight: 'calc(100vh - 64px)', overflowY: 'scroll', overflowX: 'hidden' }}>
+                            <motion.div
+                                key={location.pathname}
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                                style={{ padding: '16px 24px 24px', minHeight: '100%' }}
+                            >
+                                {currentOutlet}
+                            </motion.div>
                         </Content>
                     </Layout>
                 </Layout>

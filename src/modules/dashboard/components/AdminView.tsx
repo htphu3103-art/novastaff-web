@@ -25,7 +25,7 @@ const AdminView: React.FC = () => {
         <div className="admin-dashboard-view">
             {/* Header Section */}
             <div style={{ marginBottom: 24 }}>
-                <Title level={4}>Hệ thống Quản trị Chiến lược</Title>
+                <Title level={4} style={{ marginTop: 0 }}>Hệ thống Quản trị Chiến lược</Title>
                 <Text type="secondary">Dữ liệu được cập nhật thời gian thực từ các phòng ban.</Text>
             </div>
 

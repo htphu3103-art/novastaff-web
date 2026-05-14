@@ -56,7 +56,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
             {isAdmin ? (
                 <>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Present Today</span>} 
                                 value={admin.presentToday} 
@@ -67,7 +72,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Absent</span>} 
                                 value={admin.absent} 
@@ -77,7 +87,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Late Arrivals</span>} 
                                 value={admin.lateArrivals} 
@@ -87,7 +102,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Overtime Hours</span>} 
                                 value={admin.overtimeHours} 
@@ -98,7 +118,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Pending Leaves</span>} 
                                 value={admin.pendingLeaves} 
@@ -108,7 +133,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Total Employees</span>} 
                                 value={admin.totalEmployees} 
@@ -121,7 +151,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
             ) : (
                 <>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Working Days</span>} 
                                 value={employee.workingDays} 
@@ -132,7 +167,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
                         </Card>
                     </Col>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Total Hours</span>} 
                                 value={employee.totalHours} 
@@ -144,7 +184,12 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
                         </Card>
                     </Col>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card size="small" hoverable loading={loading}>
+                        <Card 
+                            size="small" 
+                            hoverable 
+                            loading={loading}
+                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
+                        >
                             <Statistic 
                                 title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Late Count</span>} 
                                 value={employee.lateCount} 

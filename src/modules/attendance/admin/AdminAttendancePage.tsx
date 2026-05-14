@@ -43,6 +43,7 @@ export default function AdminAttendancePage() {
     const fetchLeaveRequests = useCallback(async () => {
         setIsLeavesLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 300));
             // Lấy các đơn đang chờ duyệt (hoặc có thể lấy tất cả nếu cần)
             const res = await leaveRequestApi.getPending();
             setLeaveRequests(res.data);
@@ -56,6 +57,7 @@ export default function AdminAttendancePage() {
     const fetchStats = useCallback(async () => {
         setIsStatsLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 300));
             const today = dayjs().startOf('day');
             const endOfDay = dayjs().endOf('day');
 
@@ -101,6 +103,7 @@ export default function AdminAttendancePage() {
     const fetchAttendance = useCallback(async () => {
         setIsLoading(true);
         try {
+            await new Promise(resolve => setTimeout(resolve, 300));
             const filter: AttendanceFilter = {
                 status: statusFilter,
                 from: dateRange?.[0]?.toISOString(),
