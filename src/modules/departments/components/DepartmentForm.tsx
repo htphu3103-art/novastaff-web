@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select, Typography, FormInstance, Switch, App } from "antd";
+import { Modal, Form, Input, Select, Typography, FormInstance, Switch, App, Tag } from "antd";
 import { departmentApi } from "../api/departmentApi";
+import { employeeApi } from "../../employee/api/employeeApi";
 import { DepartmentDto } from "../types";
+import { EmployeeManagerDto } from "../../employee/types";
+import { UserOutlined, ApartmentOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -18,25 +21,39 @@ export const DepartmentForm = ({ open, isEdit, onCancel, onSave, form, saving }:
     const { message } = App.useApp();
     const [roots, setRoots] = useState<DepartmentDto[]>([]);
     const [loadingRoots, setLoadingRoots] = useState(false);
+    const [managers, setManagers] = useState<EmployeeManagerDto[]>([]);
+    const [loadingManagers, setLoadingManagers] = useState(false);
 
-    // Load root departments when opening create modal
+    // Load root departments when opening modal
     useEffect(() => {
-        if (!open || isEdit) return;
+        if (!open) return;
 
-        const fetchRoots = async () => {
-            setLoadingRoots(true);
+        const fetchData = async () => {
+            if (!isEdit) {
+                setLoadingRoots(true);
+                try {
+                    const res = await departmentApi.getRootsPaged(1, 100);
+                    setRoots(res.data.items);
+                } catch {
+                    message.error("Failed to load department list");
+                } finally {
+                    setLoadingRoots(false);
+                }
+            }
+
+            setLoadingManagers(true);
             try {
-                const res = await departmentApi.getRootsPaged(1, 100);
-                setRoots(res.data.items);
+                const res = await employeeApi.getManagers();
+                setManagers(res.data);
             } catch {
-                message.error("Failed to load department list");
+                message.error("Failed to load managers list");
             } finally {
-                setLoadingRoots(false);
+                setLoadingManagers(false);
             }
         };
 
-        fetchRoots();
-    }, [open, isEdit]);
+        fetchData();
+    }, [open, isEdit, message]);
 
     return (
         <Modal
@@ -52,6 +69,7 @@ export const DepartmentForm = ({ open, isEdit, onCancel, onSave, form, saving }:
             cancelText="Cancel"
             confirmLoading={saving}
             afterClose={() => form.resetFields()}
+            style={{ top: 20 }}
         >
             <Form form={form} layout="vertical" onFinish={onSave} style={{ paddingTop: 16 }}>
                 <Form.Item
@@ -93,6 +111,42 @@ export const DepartmentForm = ({ open, isEdit, onCancel, onSave, form, saving }:
                         />
                     </Form.Item>
                 )}
+
+                <Form.Item
+                    name="managerEmployeeId"
+                    label="Department Manager"
+                >
+                    <Select
+                        allowClear
+                        placeholder="Select a manager"
+                        loading={loadingManagers}
+                        showSearch
+                        optionFilterProp="filter"
+                        style={{ width: '100%' }}
+                        dropdownStyle={{ minWidth: 300 }}
+                        options={managers.map(m => ({
+                            value: m.employeeID,
+                            filter: `${m.fullName} ${m.employeeCode} ${m.position}`,
+                            label: (
+                                <div style={{ display: 'flex', flexDirection: 'column', padding: '4px 0' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Text strong style={{ fontSize: '14px' }}>
+                                            <UserOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+                                            {m.fullName}
+                                        </Text>
+                                        <Tag color="blue" style={{ margin: 0 }}>{m.employeeCode}</Tag>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
+                                        <Text type="secondary" style={{ fontSize: '12px', display: 'flex', alignItems: 'center' }}>
+                                            <ApartmentOutlined style={{ marginRight: 4, fontSize: '12px' }} />
+                                            {m.position || "Staff"} • {m.departmentName || "No Dept"}
+                                        </Text>
+                                    </div>
+                                </div>
+                            )
+                        }))}
+                    />
+                </Form.Item>
 
                 <Form.Item name="description" label="Description / Notes">
                     <Input.TextArea placeholder="Enter description..." rows={2} />

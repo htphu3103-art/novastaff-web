@@ -7,6 +7,7 @@ import {
     CreateEmployeeRequest,
     UpdateEmployeeRequest,
     TransferDepartmentRequest,
+    EmployeeManagerDto,
 } from "../types";
 
 export const employeeApi = {
@@ -55,6 +56,14 @@ export const employeeApi = {
      */
     getSubordinates: (id: number, signal?: AbortSignal) =>
         api.get<EmployeeDto[]>(`/employees/${id}/subordinates`, { signal }),
+    
+    /**
+     * Lấy danh sách nhân viên quản lý.
+     * Gọi đến: [HttpGet("managers")] api/employees/managers
+     */
+    getManagers: (signal?: AbortSignal) =>
+        api.get<EmployeeManagerDto[]>("/employees/managers", { signal }),
+
 
 
     // ============================================================

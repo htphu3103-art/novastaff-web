@@ -128,6 +128,7 @@ export const EmployeeForm = ({
             open={open}
             onCancel={onCancel}
             destroyOnHidden
+            style={{ top: 20 }}
             footer={[
                 <Button key="cancel" onClick={onCancel}>
                     Cancel

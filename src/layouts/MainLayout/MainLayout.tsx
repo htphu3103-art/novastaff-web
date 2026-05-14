@@ -34,8 +34,12 @@ const CONTENT_DURATION = 200; // ms — page route transition
 const SIDEBAR_STYLES = `
     /* ── Base: all animated elements use GPU-friendly properties ─────────── */
     .nova-sidebar {
-        will-change: width, min-width, max-width, flex;
-        transition: all ${SIDEBAR_DURATION}ms ${SPRING} !important;
+        will-change: width, min-width, max-width, flex, background-color;
+        transition: 
+            width ${SIDEBAR_DURATION}ms ${SPRING},
+            min-width ${SIDEBAR_DURATION}ms ${SPRING},
+            max-width ${SIDEBAR_DURATION}ms ${SPRING},
+            background-color ${SIDEBAR_DURATION}ms ${EASE_OUT} !important;
     }
 
     /* ── Menu item base ──────────────────────────────────────────────────── */
@@ -43,8 +47,9 @@ const SIDEBAR_STYLES = `
     .nova-sidebar .ant-menu-submenu-title {
         transition:
             background ${150}ms ${EASE_OUT},
-            color       ${150}ms ${EASE_OUT} !important;
-        will-change: transform;
+            color       ${150}ms ${EASE_OUT},
+            transform   ${SIDEBAR_DURATION}ms ${SPRING} !important;
+        will-change: transform, background;
     }
 
     /* ── Label text: max-width trick for smooth clip ─────────────────────── */
@@ -56,9 +61,9 @@ const SIDEBAR_STYLES = `
         white-space: nowrap;
         transform: translateX(0px);
         transition:
-            max-width   ${TEXT_DURATION}ms ${EASE_OUT},
+            max-width   ${SIDEBAR_DURATION}ms ${SPRING},
             opacity     ${TEXT_DURATION}ms ${EASE_OUT},
-            transform   ${TEXT_DURATION}ms ${EASE_OUT};
+            transform   ${SIDEBAR_DURATION}ms ${SPRING};
         will-change: max-width, opacity, transform;
     }
 
@@ -66,11 +71,13 @@ const SIDEBAR_STYLES = `
     .nova-sidebar .ant-menu-item-group-title {
         overflow: hidden;
         transition:
-            max-height  ${TEXT_DURATION}ms ${EASE_OUT},
+            max-height  ${SIDEBAR_DURATION}ms ${SPRING},
             opacity     ${TEXT_DURATION}ms ${EASE_OUT},
-            padding     ${TEXT_DURATION}ms ${EASE_OUT};
+            padding     ${SIDEBAR_DURATION}ms ${SPRING},
+            transform   ${SIDEBAR_DURATION}ms ${SPRING};
         max-height: 48px;
         opacity: 1;
+        transform: translateY(0);
     }
 
     /* ── Icon ─────────────────────────────────────────────────────────────── */
@@ -80,8 +87,10 @@ const SIDEBAR_STYLES = `
         align-items: center !important;
         justify-content: center !important;
         flex-shrink: 0;
-        transition: transform ${TEXT_DURATION}ms ${SPRING};
-        will-change: transform;
+        transition: 
+            transform ${SIDEBAR_DURATION}ms ${SPRING},
+            margin    ${SIDEBAR_DURATION}ms ${SPRING};
+        will-change: transform, margin;
     }
 
     /* ── EXPANDED state ──────────────────────────────────────────────────── */
@@ -97,7 +106,7 @@ const SIDEBAR_STYLES = `
     .nova-sidebar.ant-layout-sider-collapsed .ant-menu-title-content {
         max-width: 0 !important;
         opacity: 0 !important;
-        transform: translateX(-6px) !important;
+        transform: translateX(-12px) !important;
     }
 
     /* Group title collapses to nothing */
@@ -105,6 +114,7 @@ const SIDEBAR_STYLES = `
         max-height: 0 !important;
         opacity: 0 !important;
         padding: 0 !important;
+        transform: translateY(-8px) !important;
     }
 
     /* Icon centers when collapsed */
@@ -118,31 +128,39 @@ const SIDEBAR_STYLES = `
         justify-content: center !important;
         align-items: center !important;
         height: 40px !important;
+        border-radius: 12px !important;
     }
 
     .nova-sidebar.ant-layout-sider-collapsed .ant-menu-item .ant-menu-item-icon,
     .nova-sidebar.ant-layout-sider-collapsed .ant-menu-item-group-list .ant-menu-item .ant-menu-item-icon {
         margin: 0 !important;
-        transform: scale(1.08);
+        transform: scale(1.15);
     }
 
     /* ── Hover micro-interaction ─────────────────────────────────────────── */
     .nova-sidebar .ant-menu-item:not(.ant-menu-item-selected):hover .ant-menu-item-icon,
     .nova-sidebar .ant-menu-item-group-list .ant-menu-item:not(.ant-menu-item-selected):hover .ant-menu-item-icon {
-        transform: translateY(-1px) scale(1.05);
+        transform: translateY(-1px) scale(1.1);
     }
 
     /* ── Profile hover ───────────────────────────────────────────────────── */
     .nova-header-profile:hover {
         background: rgba(0, 0, 0, 0.04);
+        transform: translateY(-1px);
     }
 
     /* ── Collapse toggle button ──────────────────────────────────────────── */
     .nova-collapse-btn {
-        transition: background ${150}ms ${EASE_OUT} !important;
+        transition: 
+            background ${150}ms ${EASE_OUT},
+            transform ${150}ms ${EASE_OUT} !important;
     }
     .nova-collapse-btn:hover {
         background: #e2e8f0 !important;
+        transform: scale(1.05);
+    }
+    .nova-collapse-btn:active {
+        transform: scale(0.95);
     }
     .nova-collapse-icon {
         transition: transform ${SIDEBAR_DURATION}ms ${SPRING};
@@ -153,6 +171,14 @@ const SIDEBAR_STYLES = `
     .nova-collapse-icon.is-collapsed {
         transform: rotate(180deg);
     }
+
+    /* Sidebar inner content transition */
+    .nova-sidebar .ant-layout-sider-children {
+        display: flex;
+        flex-direction: column;
+        transition: padding ${SIDEBAR_DURATION}ms ${SPRING};
+    }
+
 `;
 
 export default function MainLayout() {

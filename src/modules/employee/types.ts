@@ -49,6 +49,18 @@ export interface EmployeeDto {
     supervisorName: string | null;
 }
 
+export interface EmployeeManagerDto {
+    employeeID: number;
+    employeeCode: string;
+    fullName: string;
+    position: string | null;
+    departmentId: number | null;
+    departmentName: string | null;
+    email: string;
+    phone: string | null;
+}
+
+
 // ============================================================
 // 📥 REQUESTS
 // ============================================================
