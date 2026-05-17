@@ -1,9 +1,10 @@
-import React from "react";
-import { Button, Popconfirm, Space, Table, Tag, Typography, Dropdown } from "antd";
+import React, { useMemo } from "react";
+import { Button, Popconfirm, Space, Table, Tag, Typography, Dropdown, Skeleton } from "antd";
 import type { TablePaginationConfig, ColumnsType } from "antd/es/table";
 import { DeleteOutlined, EditOutlined, DragOutlined, LockOutlined, SafetyOutlined } from "@ant-design/icons";
 import { EmployeeDto } from "../types";
 import { UserRole } from "../../auth/types";
+import { motion } from "framer-motion";
 
 const { Text } = Typography;
 
@@ -39,6 +40,33 @@ export const EmployeeTable = ({
     onDragStart,
     onDragEnd
 }: Props) => {
+    // Row animation configuration
+    const rowComponents = useMemo(() => ({
+        body: {
+            row: (props: any) => {
+                const { children, ...restProps } = props;
+                // Don't animate if it's a skeleton row or empty row
+                const isDataRow = restProps['data-row-key'] && !restProps['data-row-key'].toString().startsWith('skeleton');
+                
+                if (!isDataRow) return <tr {...props} />;
+
+                return (
+                    <motion.tr
+                        {...restProps}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ 
+                            duration: 0.4, 
+                            ease: [0.16, 1, 0.3, 1]
+                        }}
+                    >
+                        {children}
+                    </motion.tr>
+                );
+            }
+        }
+    }), []);
+
     const columns: ColumnsType<EmployeeDto> = [
         ...(draggable ? [{
             key: "drag",
@@ -60,42 +88,44 @@ export const EmployeeTable = ({
             title: "Code",
             dataIndex: "employeeCode",
             width: 110,
-            render: (value: string) => <Text strong>{value}</Text>,
+            render: (value: string, record: any) => record.isSkeleton ? <Skeleton.Button active size="small" block /> : <Text strong>{value}</Text>,
         },
         {
             title: "Full name",
             dataIndex: "fullName",
             width: 180,
+            render: (value: string, record: any) => record.isSkeleton ? <Skeleton.Input active size="small" block /> : value,
         },
         {
             title: "Email",
             dataIndex: "email",
             width: 200,
+            render: (value: string, record: any) => record.isSkeleton ? <Skeleton.Input active size="small" block /> : value,
         },
         {
             title: "Phone",
             dataIndex: "phone",
             width: 120,
-            render: (value: string | null) => value ?? "-",
+            render: (value: string | null, record: any) => record.isSkeleton ? <Skeleton.Input active size="small" block /> : (value ?? "-"),
         },
         {
             title: "Department",
             dataIndex: "departmentName",
             width: 150,
-            render: (value: string | null) => value ?? "-",
+            render: (value: string | null, record: any) => record.isSkeleton ? <Skeleton.Input active size="small" block /> : (value ?? "-"),
             hidden: draggable,
         },
         {
             title: "Position",
             dataIndex: "position",
             width: 150,
-            render: (value: string | null) => value ?? "-",
+            render: (value: string | null, record: any) => record.isSkeleton ? <Skeleton.Input active size="small" block /> : (value ?? "-"),
         },
         {
             title: "Status",
             dataIndex: "status",
             width: 110,
-            render: (status: string) => (
+            render: (status: string, record: any) => record.isSkeleton ? <Skeleton.Button active size="small" style={{ width: 60 }} /> : (
                 <Tag color={statusColorMap[status] ?? "blue"}>{status}</Tag>
             ),
         },
@@ -103,7 +133,7 @@ export const EmployeeTable = ({
             title: "Action",
             key: "action",
             width: 160,
-            render: (_: any, record: EmployeeDto) => (
+            render: (_: any, record: any) => record.isSkeleton ? <Space size={4}><Skeleton.Avatar active size="small" shape="square" /><Skeleton.Avatar active size="small" shape="square" /></Space> : (
                 <Space size={4}>
                     <Button type="text" size="small" icon={<EditOutlined />} onClick={() => onEdit(record)} title="Edit" />
                     
@@ -146,14 +176,26 @@ export const EmployeeTable = ({
         },
     ].filter(c => !(c as any).hidden);
 
+    // Prepare skeleton data if loading and no data
+    const displayData = useMemo(() => {
+        if (loading && dataSource.length === 0) {
+            return Array.from({ length: pagination ? (typeof pagination === 'object' ? (pagination.pageSize || 5) : 5) : 5 }).map((_, i) => ({
+                id: `skeleton-${i}`,
+                isSkeleton: true
+            } as any));
+        }
+        return dataSource;
+    }, [loading, dataSource, pagination]);
+
     return (
         <Table
             rowKey="id"
-            loading={loading}
+            loading={loading && dataSource.length > 0} // Only show native loading if we have data (refreshing)
             columns={columns}
-            dataSource={dataSource}
+            dataSource={displayData}
             pagination={pagination}
             scroll={{ x: "max-content" }}
+            components={rowComponents}
         />
     );
 };

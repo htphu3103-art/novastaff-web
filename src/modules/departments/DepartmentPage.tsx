@@ -63,7 +63,7 @@ export default function DepartmentPage() {
     const [searchText, setSearchText] = useState("");
     const [displayMode, setDisplayMode] = useState<"browse" | "search">("browse");
     const [employees, setEmployees] = useState<EmployeeDto[]>([]);
-    const [employeeLoading, setEmployeeLoading] = useState(false);
+    const [employeeLoading, setEmployeeLoading] = useState(true);
     const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<EmployeeDto | null>(null);
     const [employeeSubmitting, setEmployeeSubmitting] = useState(false);
@@ -265,7 +265,6 @@ export default function DepartmentPage() {
     const loadEmployeesByDepartment = useCallback(async () => {
         setEmployeeLoading(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
             if (browser.currentNode.id == null) {
                 const res = await employeeApi.getPaged({}, 1, 50);
                 setEmployees(res.data.items);
@@ -451,7 +450,8 @@ export default function DepartmentPage() {
                     height: "100vh",
                     position: "sticky",
                     top: 0,
-                    overflow: "auto"
+                    overflow: "auto",
+                    scrollbarGutter: 'stable'
                 }}
             >
                 <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>

@@ -308,7 +308,7 @@ export default function AdminTaskPage({ user }: any) {
             </div>
 
             <Spin spinning={isLoading} description="Đang tải công việc...">
-                <Row gutter={16} style={{ height: 'calc(100vh - 200px)' }}>
+                <Row gutter={16}>
                     {COLUMNS.map(col => (
                         <Col span={8} key={col.key}>
                             <KanbanColumn

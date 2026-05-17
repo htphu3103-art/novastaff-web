@@ -203,11 +203,10 @@ const ChatPage: React.FC = () => {
     return (
         <Layout
             style={{
-                height: 'calc(100vh - 112px)',
                 background: '#fff',
                 borderRadius: 10,
-                overflow: 'hidden',
                 border: '0.5px solid #ebebeb',
+                flex: 1,
             }}
         >
             {/* ── Sidebar ───────────────────────────────────────────── */}
@@ -318,7 +317,7 @@ const ChatPage: React.FC = () => {
                 </div>
 
                 {/* Messages */}
-                <div style={{ flex: 1, padding: '16px 18px', overflowY: 'auto', background: '#fff' }}>
+                <div style={{ flex: 1, padding: '16px 18px', background: '#fff' }}>
                     <div style={{
                         textAlign: 'center', fontSize: 11, color: '#bbb',
                         marginBottom: 16, position: 'relative',

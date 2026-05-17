@@ -12,13 +12,46 @@ import { leaveRequestApi } from '../api/leaveRequestApi';
 import dayjs from 'dayjs';
 import { Tabs } from 'antd';
 
+import { motion, Variants, AnimatePresence } from 'framer-motion';
+
+const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.08
+        }
+    }
+};
+
+const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+            ease: "easeOut"
+        }
+    }
+};
+
+const tabContentVariants: Variants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
+        opacity: 1, 
+        y: 0,
+        transition: { duration: 0.3, ease: "easeOut" }
+    }
+};
+
 const { Title, Text } = Typography;
 
 export default function AdminAttendancePage() {
     const { message, modal } = App.useApp();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isStatsLoading, setIsStatsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isStatsLoading, setIsStatsLoading] = useState(true);
     const [dataSource, setDataSource] = useState<AttendanceDto[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const [adminStats, setAdminStats] = useState({
@@ -31,7 +64,7 @@ export default function AdminAttendancePage() {
     });
 
     const [leaveRequests, setLeaveRequests] = useState<LeaveRequestDto[]>([]);
-    const [isLeavesLoading, setIsLeavesLoading] = useState(false);
+    const [isLeavesLoading, setIsLeavesLoading] = useState(true);
 
     // Filter states
     const [searchText, setSearchText] = useState('');
@@ -43,8 +76,6 @@ export default function AdminAttendancePage() {
     const fetchLeaveRequests = useCallback(async () => {
         setIsLeavesLoading(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
-            // Lấy các đơn đang chờ duyệt (hoặc có thể lấy tất cả nếu cần)
             const res = await leaveRequestApi.getPending();
             setLeaveRequests(res.data);
         } catch (error) {
@@ -57,7 +88,6 @@ export default function AdminAttendancePage() {
     const fetchStats = useCallback(async () => {
         setIsStatsLoading(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
             const today = dayjs().startOf('day');
             const endOfDay = dayjs().endOf('day');
 
@@ -103,14 +133,16 @@ export default function AdminAttendancePage() {
     const fetchAttendance = useCallback(async () => {
         setIsLoading(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
             const filter: AttendanceFilter = {
                 status: statusFilter,
                 from: dateRange?.[0]?.toISOString(),
                 to: dateRange?.[1]?.toISOString(),
             };
 
-            const response = await attendanceApi.getPaged(filter, pageIndex, pageSize);
+            const [response] = await Promise.all([
+                attendanceApi.getPaged(filter, pageIndex, pageSize),
+                new Promise(resolve => setTimeout(resolve, 300))
+            ]);
             setDataSource(response.data.items);
             setTotalCount(response.data.totalCount);
         } catch (error) {
@@ -197,8 +229,16 @@ export default function AdminAttendancePage() {
     }, [leaveRequests]);
 
     return (
-        <div className="admin-attendance-page">
-            <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <motion.div 
+            className="admin-attendance-page"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div 
+                style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}
+                variants={itemVariants}
+            >
                 <div>
                     <Title level={3} style={{ margin: 0 }}>Quản lý Chấm công Hệ thống</Title>
                     <Text type="secondary">Theo dõi và điều chỉnh dữ liệu chấm công của toàn bộ nhân viên</Text>
@@ -208,111 +248,149 @@ export default function AdminAttendancePage() {
                     <Button icon={<PlusOutlined />} type="primary" onClick={() => setIsCreateModalOpen(true)}>Nhập thủ công</Button>
                     <Button icon={<ExportOutlined />}>Xuất báo cáo (Excel)</Button>
                 </Space>
-            </div>
+            </motion.div>
 
-            <AttendanceStats isAdmin={true} adminStats={adminStats} loading={isStatsLoading || isLoading} />
+            <motion.div variants={itemVariants}>
+                <AttendanceStats isAdmin={true} adminStats={adminStats} loading={isStatsLoading || isLoading} />
+            </motion.div>
 
-            <Tabs
-                defaultActiveKey="1"
-                type="card"
-                className="attendance-tabs"
-                items={[
-                    {
-                        key: '1',
-                        label: 'Nhật ký Chấm công',
-                        children: (
-                            <>
-                                <Card style={{ marginBottom: 24, borderRadius: 12 }}>
-                                    <Row gutter={[16, 16]}>
-                                        <Col xs={24} sm={12} lg={6}>
-                                            <Input
-                                                placeholder="Tìm kiếm theo ID hoặc Tên..."
-                                                prefix={<SearchOutlined />}
-                                                value={searchText}
-                                                onChange={(e) => setSearchText(e.target.value)}
-                                                onPressEnter={handleFilter}
-                                            />
-                                        </Col>
-                                        <Col xs={24} sm={12} lg={7}>
-                                            <DatePicker.RangePicker
-                                                style={{ width: '100%' }}
-                                                value={dateRange}
-                                                onChange={(dates) => setDateRange(dates as any)}
-                                            />
-                                        </Col>
-                                        <Col xs={24} sm={12} lg={6}>
-                                            <Select
-                                                placeholder="Trạng thái"
-                                                style={{ width: '100%' }}
-                                                allowClear
-                                                value={statusFilter}
-                                                onChange={setStatusFilter}
-                                            >
-                                                <Select.Option value={AttendanceStatus.Present}>Có mặt (Present)</Select.Option>
-                                                <Select.Option value={AttendanceStatus.Late}>Đi muộn (Late)</Select.Option>
-                                                <Select.Option value={AttendanceStatus.Absent}>Vắng mặt (Absent)</Select.Option>
-                                                <Select.Option value={AttendanceStatus.HalfDay}>Nửa ngày (Half Day)</Select.Option>
-                                                <Select.Option value={AttendanceStatus.Leave}>Nghỉ phép (On Leave)</Select.Option>
-                                            </Select>
-                                        </Col>
-                                        <Col xs={24} lg={5}>
-                                            <Button type="primary" block onClick={handleFilter}>Lọc dữ liệu</Button>
-                                        </Col>
-                                    </Row>
-                                </Card>
+            <motion.div variants={itemVariants}>
+                <Tabs
+                    defaultActiveKey="1"
+                    type="card"
+                    className="attendance-tabs"
+                    destroyInactiveTabPane={true}
+                    items={[
+                        {
+                            key: '1',
+                            label: 'Nhật ký Chấm công',
+                            children: (
+                                <motion.div
+                                    variants={tabContentVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    <Card style={{ marginBottom: 24, borderRadius: 12 }}>
+                                        <Row gutter={[16, 16]}>
+                                            <Col xs={24} sm={12} lg={6}>
+                                                <Input
+                                                    placeholder="Tìm kiếm theo ID hoặc Tên..."
+                                                    prefix={<SearchOutlined />}
+                                                    value={searchText}
+                                                    onChange={(e) => setSearchText(e.target.value)}
+                                                    onPressEnter={handleFilter}
+                                                />
+                                            </Col>
+                                            <Col xs={24} sm={12} lg={7}>
+                                                <DatePicker.RangePicker
+                                                    style={{ width: '100%' }}
+                                                    value={dateRange}
+                                                    onChange={(dates) => setDateRange(dates as any)}
+                                                />
+                                            </Col>
+                                            <Col xs={24} sm={12} lg={6}>
+                                                <Select
+                                                    placeholder="Trạng thái"
+                                                    style={{ width: '100%' }}
+                                                    allowClear
+                                                    value={statusFilter}
+                                                    onChange={setStatusFilter}
+                                                >
+                                                    <Select.Option value={AttendanceStatus.Present}>Có mặt (Present)</Select.Option>
+                                                    <Select.Option value={AttendanceStatus.Late}>Đi muộn (Late)</Select.Option>
+                                                    <Select.Option value={AttendanceStatus.Absent}>Vắng mặt (Absent)</Select.Option>
+                                                    <Select.Option value={AttendanceStatus.HalfDay}>Nửa ngày (Half Day)</Select.Option>
+                                                    <Select.Option value={AttendanceStatus.Leave}>Nghỉ phép (On Leave)</Select.Option>
+                                                </Select>
+                                            </Col>
+                                            <Col xs={24} lg={5}>
+                                                <Button type="primary" block onClick={handleFilter}>Lọc dữ liệu</Button>
+                                            </Col>
+                                        </Row>
+                                    </Card>
 
-                                <Card style={{ borderRadius: 12 }}>
-                                    <AttendanceTable
-                                        isAdmin={true}
-                                        dataSource={dataSource}
-                                        loading={isLoading}
-                                        onDelete={handleDelete}
-                                        onRefresh={() => { fetchAttendance(); fetchStats(); }}
-                                    />
-                                </Card>
-                            </>
-                        )
-                    },
-                    {
-                        key: '2',
-                        label: 'Duyệt đơn Nghỉ phép',
-                        children: (
-                            <Card style={{ borderRadius: 12 }}>
-                                <LeaveRequestTable
-                                    dataSource={leaveRequests}
-                                    onApprove={handleApproveLeave}
-                                    onReject={handleRejectLeave}
-                                    onView={(record: LeaveRequestDto) => {
-                                        modal.info({
-                                            title: 'Chi tiết đơn nghỉ phép',
-                                            content: (
-                                                <div style={{ marginTop: 16 }}>
-                                                    <p><b>Nhân viên:</b> {record.employeeName} ({record.employeeCode})</p>
-                                                    <p><b>Loại nghỉ:</b> {record.leaveType}</p>
-                                                    <p><b>Thời gian:</b> {dayjs(record.fromDate).format('DD/MM/YYYY')} - {dayjs(record.toDate).format('DD/MM/YYYY')}</p>
-                                                    <p><b>Lý do:</b> {record.reason}</p>
-                                                    <p><b>Trạng thái:</b> {record.status}</p>
-                                                    {record.approvedBy && <p><b>Người duyệt (ID):</b> {record.approvedBy}</p>}
-                                                    {record.approvedDate && <p><b>Ngày duyệt:</b> {dayjs(record.approvedDate).format('DD/MM/YYYY HH:mm')}</p>}
-                                                </div>
-                                            ),
-                                            width: 500
-                                        });
-                                    }}
-                                />
-                            </Card>
-                        )
-                    }
-                ]}
-            />
+                                    <Card style={{ borderRadius: 12, minHeight: 460 }}>
+                                        <AnimatePresence mode="wait">
+                                            {isLoading ? (
+                                                <motion.div
+                                                    key="loading"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    transition={{ duration: 0.2 }}
+                                                >
+                                                    <AttendanceTable
+                                                        isAdmin={true}
+                                                        dataSource={[]}
+                                                        loading={true}
+                                                    />
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="data"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                >
+                                                    <AttendanceTable
+                                                        isAdmin={true}
+                                                        dataSource={dataSource}
+                                                        loading={false}
+                                                        onDelete={handleDelete}
+                                                        onRefresh={() => { fetchAttendance(); fetchStats(); }}
+                                                    />
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </Card>
+                                </motion.div>
+                            )
+                        },
+                        {
+                            key: '2',
+                            label: 'Duyệt đơn Nghỉ phép',
+                            children: (
+                                <motion.div
+                                    variants={tabContentVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    <Card style={{ borderRadius: 12, minHeight: 460 }}>
+                                        <LeaveRequestTable
+                                            dataSource={leaveRequests}
+                                            onApprove={handleApproveLeave}
+                                            onReject={handleRejectLeave}
+                                            onView={(record: LeaveRequestDto) => {
+                                                modal.info({
+                                                    title: 'Chi tiết đơn nghỉ phép',
+                                                    content: (
+                                                        <div style={{ marginTop: 16 }}>
+                                                            <p><b>Nhân viên:</b> {record.employeeName} ({record.employeeCode})</p>
+                                                            <p><b>Loại nghỉ:</b> {record.leaveType}</p>
+                                                            <p><b>Thời gian:</b> {dayjs(record.fromDate).format('DD/MM/YYYY')} - {dayjs(record.toDate).format('DD/MM/YYYY')}</p>
+                                                            <p><b>Lý do:</b> {record.reason}</p>
+                                                            <p><b>Trạng thái:</b> {record.status}</p>
+                                                            {record.approvedBy && <p><b>Người duyệt (ID):</b> {record.approvedBy}</p>}
+                                                            {record.approvedDate && <p><b>Ngày duyệt:</b> {dayjs(record.approvedDate).format('DD/MM/YYYY HH:mm')}</p>}
+                                                        </div>
+                                                    ),
+                                                    width: 500
+                                                });
+                                            }}
+                                        />
+                                    </Card>
+                                </motion.div>
+                            )
+                        }
+                    ]}
+                />
+            </motion.div>
 
             <AttendanceFormModal
                 open={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSuccess={() => { fetchAttendance(); fetchStats(); }}
             />
-        </div>
+        </motion.div>
     );
 }
-
-

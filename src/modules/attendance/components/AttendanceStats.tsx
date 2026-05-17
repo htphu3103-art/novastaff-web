@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Col, Row, Statistic } from 'antd';
+import { Card, Col, Row, Statistic, Skeleton, Space } from 'antd';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
     CheckCircleOutlined, 
     UserDeleteOutlined, 
@@ -47,6 +48,33 @@ const defaultEmployeeStats: EmployeeAttendanceStats = {
     lateCount: 0,
 };
 
+const StatValue = ({ loading, children }: { loading: boolean, children: React.ReactNode }) => (
+    <div style={{ height: 32, display: 'flex', alignItems: 'center' }}>
+        <AnimatePresence mode="wait">
+            {loading ? (
+                <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{ width: '60%' }}
+                >
+                    <Skeleton.Button active size="small" block style={{ height: 24, borderRadius: 4 }} />
+                </motion.div>
+            ) : (
+                <motion.div
+                    key="value"
+                    initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                    {children}
+                </motion.div>
+            )}
+        </AnimatePresence>
+    </div>
+);
+
 export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = false }: AttendanceStatsProps) => {
     const admin = adminStats ?? defaultAdminStats;
     const employee = employeeStats ?? defaultEmployeeStats;
@@ -56,146 +84,109 @@ export const AttendanceStats = ({ isAdmin, adminStats, employeeStats, loading = 
             {isAdmin ? (
                 <>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Present Today</span>} 
-                                value={admin.presentToday} 
-                                prefix={<CheckCircleOutlined style={{ color: '#52c41a', fontSize: '16px' }} />}
-                                suffix={<span style={{ fontSize: '12px' }}>{`/ ${admin.totalEmployees}`}</span>}
-                                styles={{ content: { color: '#52c41a', fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Present Today</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
+                                    <span style={{ color: '#52c41a', fontSize: '18px', fontWeight: 'bold' }}>{admin.presentToday}</span>
+                                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>{`/ ${admin.totalEmployees}`}</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Absent</span>} 
-                                value={admin.absent} 
-                                prefix={<UserDeleteOutlined style={{ color: '#ff4d4f', fontSize: '16px' }} />}
-                                styles={{ content: { color: '#ff4d4f', fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Absent</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <UserDeleteOutlined style={{ color: '#ff4d4f', fontSize: '16px' }} />
+                                    <span style={{ color: '#ff4d4f', fontSize: '18px', fontWeight: 'bold' }}>{admin.absent}</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Late Arrivals</span>} 
-                                value={admin.lateArrivals} 
-                                prefix={<ClockCircleOutlined style={{ color: '#faad14', fontSize: '16px' }} />}
-                                styles={{ content: { color: '#faad14', fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Late Arrivals</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <ClockCircleOutlined style={{ color: '#faad14', fontSize: '16px' }} />
+                                    <span style={{ color: '#faad14', fontSize: '18px', fontWeight: 'bold' }}>{admin.lateArrivals}</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Overtime Hours</span>} 
-                                value={admin.overtimeHours} 
-                                prefix={<RocketOutlined style={{ color: '#1890ff', fontSize: '16px' }} />}
-                                suffix={<span style={{ fontSize: '12px' }}>h</span>}
-                                styles={{ content: { color: '#1890ff', fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Overtime Hours</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <RocketOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
+                                    <span style={{ color: '#1890ff', fontSize: '18px', fontWeight: 'bold' }}>{admin.overtimeHours}</span>
+                                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>h</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Pending Leaves</span>} 
-                                value={admin.pendingLeaves} 
-                                prefix={<CalendarOutlined style={{ color: '#722ed1', fontSize: '16px' }} />}
-                                styles={{ content: { color: '#722ed1', fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Pending Leaves</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <CalendarOutlined style={{ color: '#722ed1', fontSize: '16px' }} />
+                                    <span style={{ color: '#722ed1', fontSize: '18px', fontWeight: 'bold' }}>{admin.pendingLeaves}</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                     <Col xs={12} sm={8} lg={4}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Total Employees</span>} 
-                                value={admin.totalEmployees} 
-                                prefix={<TeamOutlined style={{ fontSize: '16px' }} />}
-                                styles={{ content: { fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Total Employees</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <TeamOutlined style={{ fontSize: '16px' }} />
+                                    <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{admin.totalEmployees}</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                 </>
             ) : (
                 <>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Working Days</span>} 
-                                value={employee.workingDays} 
-                                prefix={<LineChartOutlined style={{ color: '#1890ff', fontSize: '16px' }} />}
-                                suffix={<span style={{ fontSize: '12px' }}>days</span>} 
-                                styles={{ content: { fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Working Days</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <LineChartOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
+                                    <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{employee.workingDays}</span>
+                                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>days</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Total Hours</span>} 
-                                value={employee.totalHours} 
-                                precision={2} 
-                                prefix={<ClockCircleOutlined style={{ color: '#52c41a', fontSize: '16px' }} />}
-                                suffix={<span style={{ fontSize: '12px' }}>hrs</span>} 
-                                styles={{ content: { fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Total Hours</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <ClockCircleOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
+                                    <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{employee.totalHours.toFixed(2)}</span>
+                                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>hrs</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card 
-                            size="small" 
-                            hoverable 
-                            loading={loading}
-                            styles={{ body: { height: 80, display: 'flex', alignItems: 'center' } }}
-                        >
-                            <Statistic 
-                                title={<span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500 }}>Late Count</span>} 
-                                value={employee.lateCount} 
-                                prefix={<ClockCircleOutlined style={{ color: '#ff4d4f', fontSize: '16px' }} />}
-                                styles={{ content: { color: '#ff4d4f', fontSize: '18px', fontWeight: 'bold' } }} 
-                            />
+                        <Card size="small" hoverable styles={{ body: { height: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' } }}>
+                            <span style={{ fontSize: '14px', whiteSpace: 'nowrap', fontWeight: 500, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>Late Count</span>
+                            <StatValue loading={loading}>
+                                <Space>
+                                    <ClockCircleOutlined style={{ color: '#ff4d4f', fontSize: '16px' }} />
+                                    <span style={{ color: '#ff4d4f', fontSize: '18px', fontWeight: 'bold' }}>{employee.lateCount}</span>
+                                </Space>
+                            </StatValue>
                         </Card>
                     </Col>
                 </>

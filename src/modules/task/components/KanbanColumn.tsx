@@ -26,7 +26,6 @@ export default function KanbanColumn({ title, status, tasks, color, isAdmin, onD
                 padding: 12,
                 borderRadius: 12,
                 minHeight: 600,
-                maxHeight: 'calc(100vh - 200px)',
                 display: 'flex',
                 flexDirection: 'column',
                 transition: 'background 0.2s'
@@ -41,7 +40,6 @@ export default function KanbanColumn({ title, status, tasks, color, isAdmin, onD
                 ref={setNodeRef}
                 style={{
                     flex: 1,
-                    overflowY: 'auto',
                     padding: '4px'
                 }}
             >

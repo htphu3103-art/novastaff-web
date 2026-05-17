@@ -450,6 +450,9 @@ export default function MainLayout() {
                         marginLeft: collapsed ? 68 : 200,
                         transition: `margin-left ${SIDEBAR_DURATION}ms ${SPRING}`,
                         willChange: 'margin-left',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100vh',
                     }}>
                         {/* Header */}
                         <Header style={{
@@ -460,7 +463,8 @@ export default function MainLayout() {
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            position: 'sticky', top: 0, zIndex: 90,
+                            flexShrink: 0,
+                            zIndex: 90,
                             borderBottom: '1px solid rgba(226,232,240,0.8)',
                         }}>
                             <Space size={16}>
@@ -565,19 +569,58 @@ export default function MainLayout() {
                         </Header>
 
                         {/* Page content */}
-                        <Content style={{ padding: '0px', background: '#f8fafc', minHeight: 'calc(100vh - 64px)', overflowY: 'scroll', overflowX: 'hidden' }}>
+                        <Content style={{ 
+                            padding: '0px', 
+                            background: '#f8fafc', 
+                            flex: 1, 
+                            overflow: 'auto',
+                            scrollbarGutter: 'stable',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            position: 'relative'
+                        }}>
+                            {/* Senior Top Progress Indicator */}
                             <motion.div
-                                key={location.pathname}
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                                style={{ padding: '16px 24px 24px', minHeight: '100%' }}
-                            >
-                                {currentOutlet}
-                            </motion.div>
+                                key={`progress-${location.pathname}`}
+                                initial={{ width: "0%", opacity: 1 }}
+                                animate={{ width: "100%", opacity: 0 }}
+                                transition={{ duration: 0.6, ease: "circOut" }}
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    height: '2px',
+                                    background: 'linear-gradient(90deg, #4f46e5, #818cf8)',
+                                    zIndex: 1000,
+                                    boxShadow: '0 0 8px rgba(79, 70, 229, 0.4)'
+                                }}
+                            />
+
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={location.pathname}
+                                    initial={{ opacity: 0, y: 12, scale: 0.98, filter: 'blur(8px)' }}
+                                    animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                                    exit={{ opacity: 0, y: -12, scale: 1.02, filter: 'blur(8px)' }}
+                                    transition={{ 
+                                        duration: 0.3, 
+                                        ease: [0.16, 1, 0.3, 1] 
+                                    }}
+                                    style={{ 
+                                        padding: '16px 24px 24px', 
+                                        flex: 1,
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column'
+                                    }}
+                                >
+                                    {currentOutlet}
+                                </motion.div>
+                            </AnimatePresence>
                         </Content>
                     </Layout>
                 </Layout>
+
             </App>
         </ConfigProvider>
     )

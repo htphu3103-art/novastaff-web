@@ -118,9 +118,9 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
                 loading={loading}
             /> */}
 
-            <div style={{ marginTop: 24, flex: 1, overflow: 'auto' }}>
+            <div style={{ marginTop: 24, flex: 1 }}>
                 {loading && treeData.length === 0 ? (
-                    <Skeleton active paragraph={{ rows: 10 }} />
+                    <div style={{ padding: '20px', textAlign: 'center' }}><Spin size="small" tip="Loading..." /></div>
                 ) : (
                     <Tree
                         treeData={treeData}
