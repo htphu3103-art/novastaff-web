@@ -8,6 +8,7 @@ import ChatPage from "../modules/chat/ChatPage"
 import AttendancePage from "../modules/attendance/AttendancePage"
 import PayrollPage from "../modules/payroll/PayrollPage"
 import LoginPage from "../modules/auth/LoginPage"
+import ActivateAccountPage from "../modules/auth/ActivateAccountPage"
 import ProtectedRoute from "./ProtectedRoute"
 
 export default function AppRoutes() {
@@ -15,6 +16,7 @@ export default function AppRoutes() {
         <Routes>
             {/* PUBLIC ROUTES */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/activate" element={<ActivateAccountPage />} />
 
             {/* PRIVATE ROUTES (Yêu cầu đăng nhập) */}
             <Route element={<MainLayout />}>

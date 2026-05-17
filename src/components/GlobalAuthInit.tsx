@@ -30,8 +30,9 @@ export const GlobalAuthInit = ({ children }: { children: React.ReactNode }) => {
         // Lắng nghe sự kiện logout từ axiosClient khi gặp 401
         const handleAuthLogout = () => {
             logout();
-            // Nếu không ở trang login thì đẩy về login
-            if (location.pathname !== "/login") {
+            // Các public routes không bị ép về trang đăng nhập
+            const publicRoutes = ["/login", "/activate"];
+            if (!publicRoutes.includes(location.pathname)) {
                 navigate("/login");
             }
         };

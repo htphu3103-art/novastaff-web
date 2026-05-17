@@ -35,3 +35,9 @@ export interface ChangePasswordRequest {
 export interface UpdateUserRoleRequest {
     role: UserRole;
 }
+
+export interface ActivateAccountRequest {
+    token: string;
+    newPassword: string;
+    confirmPassword: string;
+}

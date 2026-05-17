@@ -78,7 +78,7 @@ axiosClient.interceptors.response.use(
             try {
                 // Gọi API refresh (withCredentials: true sẽ tự gửi HttpOnly Cookie)
                 const response = await axios.post<{ accessToken: string }>(
-                    "http://localhost:5102/api/auth/refresh",
+                    `${axiosClient.defaults.baseURL}/auth/refresh`,
                     {},
                     { withCredentials: true }
                 );

@@ -6,7 +6,8 @@ import {
     ChangePasswordRequest,
     UpdateUserRoleRequest,
     UserProfileDto,
-    UserRole
+    UserRole,
+    ActivateAccountRequest
 } from "../types";
 
 export const authApi = {
@@ -22,6 +23,9 @@ export const authApi = {
 
     refreshToken: () =>
         api.post<{ accessToken: string }>("/auth/refresh"),
+
+    activateAccount: (data: ActivateAccountRequest) =>
+        api.post("/auth/activate", data),
 
     // ============================================================
     // 👤 NHÓM NGƯỜI DÙNG - CÁ NHÂN (PROFILE / SELF)
